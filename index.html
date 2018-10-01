@@ -1,0 +1,96 @@
+<style id="jsbin-css">
+body {
+  color: #6cacc5;
+  font: 300 18px/1.6 "Source Sans Pro",sans-serif;
+  margin: 0;
+  padding: 5em 0 2em;
+  text-align: center;
+}
+
+html {
+  background: #100a1c;
+  background-image:
+    radial-gradient(50% 30% ellipse at center top, #201e40 0%, rgba(0,0,0,0) 100%),
+    radial-gradient(60% 50% ellipse at center bottom, #261226 0%, #100a1c 100%);
+  background-attachment: fixed;
+  color: #6cacc5;
+}
+
+h1 {
+  font-weight: 300;
+  margin: 0;
+}
+
+.viewer {
+  color: #c97874;
+  text-align: right;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: 7.5em;
+  height: 3em;
+}
+</style>
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://unpkg.com/stimulus/dist/stimulus.umd.js"></script>
+  <script>
+    function fileSize(bytes) {
+      var exp = Math.log(bytes) / Math.log(1024) | 0;
+      var result = (bytes / Math.pow(1024, exp)).toFixed(2);
+
+      return result + ' ' + (exp == 0 ? 'bytes': 'KMGTPEZY'[exp - 1] + 'B');
+    }
+    function unhumanize(text) { 
+      var powers = {'k': 1, 'm': 2, 'g': 3, 't': 4};
+      var regex = /(\d+(?:\.\d+)?)\s?(k|m|g|t)?b?/i;
+
+      var res = regex.exec(text);
+
+      return res[1] * Math.pow(1024, powers[res[2].toLowerCase()]);
+    }
+    
+    function calc(text) {
+      // Convert any human-readable things to ints
+      (text.match(/\d+[a-zA-Z]+/g) || []).forEach(function(sub){
+        console.log("replacing sub", sub)
+        text = text.replace(sub, unhumanize(sub))
+      })
+      
+      // Perform the operation(s)
+      // TODO: Do it better -- https://codereview.stackexchange.com/questions/6963/simple-four-function-calculator
+      var dangerWill = eval(text)
+      
+      // Return the final, human-readable size
+      return fileSize(dangerWill)
+    }
+
+  </script>
+  <script>
+    (() => {
+      const application = Stimulus.Application.start()
+
+      application.register("hello", class extends Stimulus.Controller {
+        static get targets() {
+          return [ "name", "output" ]
+        }
+
+        greet() {
+          this.outputTarget.textContent =
+            calc(this.nameTarget.value);
+        }
+      })
+    })()
+  </script>
+<head>
+<body>
+  <h1>Byteable Calculator
+  <div data-controller="hello">
+    <input data-target="hello.name" type="text" data-action="keyup->hello#greet" data-action="paste->hello#greet">
+    <br /><br />
+    <span class="viewer" data-target="hello.output">
+    </span>
+  </div>
+</body>
+</html>
