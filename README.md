@@ -1,6 +1,6 @@
 # Byteable Calc
 
-A simple HTML-based calculator that allows you to easily parse byte strings to human-readable values and do math with them!
+http://dacort.github.io/byteable-calc A simple HTML-based calculator that allows you to easily parse byte strings to human-readable values and do math with them!
 
 ## Overview
 
